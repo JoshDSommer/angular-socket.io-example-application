@@ -16,16 +16,16 @@ http.listen(3568, function () {
 });
 
 // handle incoming connections from clients
-io.sockets.on('connection', function(socket) {
-	socket.on('joinRoom', function (roomName, username) {
+io.sockets.on('connection', function (socket) {
+	socket.on('joinRoom', (roomName, username) => {
 		people[socket.id] = username;
 		userEnterRoom(roomName);
-		console.log(username,' joined the room');
+		console.log(username, ' joined the room', roomName);
 	});
 
-	socket.on('roomMessage', function (message, room) {
-		console.log(room,message)
-		socket.to(room).emit('roomMessage', message);
+	socket.on('roomMessage', (message, room) => {
+		console.log(room, message)
+		socket.to(room).emit('roomMessage', createMessage(message));
 	});
 
 	socket.on('leaveRoom', (roomName) => {
@@ -34,7 +34,10 @@ io.sockets.on('connection', function(socket) {
 		localServerFunctions.leaveRoom(roomName);
 	});
 
-		}
+	userEnterRoom = (roomName) => {
 		socket.join(roomName);
+		socket.to(roomName).emit('roomMessage', createMessage(`${people[socket.id]} joined ${roomName}`));
 	}
+
+	createMessage = (message) => ({ message, username: people[socket.id] });
 });
