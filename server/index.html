@@ -1,0 +1,38 @@
+<html>
+	<head></head>
+
+	<body>
+		Username: <input id='userName'>
+		<br><br>
+		Enter Room: <input id='roomName' value="TheRoom"><button onclick="joinRoom(document.getElementById('roomName').value, document.getElementById('userName').value)">Join</button>
+		<br><br>
+		Send message to current room:<input id='message'> <button onclick="sendMessageToCurrentRoom(document.getElementById('message').value)">Send</button>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var socket = io('http://localhost:3568');
+
+			var currentRoom = '';
+
+			socket.on('userEnterRoom', function (userName) {
+				console.log('User ' + userName + ' entered the room');
+			});
+
+			socket.on('userExitRoom', function(userName){
+				console.log('User ' + userName + ' exited the room');
+			});
+
+			socket.on('roomMessage', function(message){
+				console.log(message);
+			});
+
+			function joinRoom(roomName, userName){
+				socket.emit('joinRoom', roomName, userName);
+				currentRoom = roomName;
+			}
+
+			function sendMessageToCurrentRoom(message){
+				socket.emit('roomMessage', message, currentRoom);
+			}
+		</script>
+	</body>
+</html>
