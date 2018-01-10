@@ -28,10 +28,11 @@ io.sockets.on('connection', function(socket) {
 		socket.to(room).emit('roomMessage', message);
 	});
 
-	function userEnterRoom(roomName) {
-		var room = io.sockets.adapter.rooms[roomName];
-		if (room && room.length > 0) {
-			socket.to(roomName).emit('roomMessage', people[socket.id] + ' joined ' + roomName);
+	socket.on('leaveRoom', (roomName) => {
+		this.socket.leave(roomName);
+		socket.to(roomName).emit('roomMessage', createMessage(`${people[socket.id]} left ${roomName}`));
+		localServerFunctions.leaveRoom(roomName);
+	});
 
 		}
 		socket.join(roomName);
